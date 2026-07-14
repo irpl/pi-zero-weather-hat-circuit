@@ -42,12 +42,27 @@ The netlist is not a guess. Gerbers contain no connectivity, but the copper does
 
 **R1 = 5 kΩ.** Component values are not in Gerber data, but this one is pinned down two ways: the colour bands on the fitted resistor read green-black-red, and the empirical voltage table in [`wind_dir.py`](https://github.com/irpl/pi-weather/blob/main/src/wind_dir.py) matches a 5 kΩ divider against the standard vane resistances at every point — a 1 kΩ vane arm gives 3.3 × 5/6 = 2.75 V, and 2.75 is exactly what the table records for 90°.
 
+### Fidelity of the reconstructed board
+
+The `.kicad_pcb` is not a bare tracing: pads are grouped into components with reference designators and pin numbers, and the recovered netlist is applied to pads, tracks and vias. It opens with a working ratsnest and passes connectivity DRC. Contents: 6 components (77 pads), 8 unplated mounting holes, 2 vias, 100 tracks, 11 nets — 87 drilled holes in total, matching the drill file exactly.
+
+Copper geometry was checked against the source Gerbers by re-plotting from the reconstruction and comparing: **0.000 mm difference in total track length on both layers**, pad positions within 1.6 µm (coordinate rounding in the 2020 files), and identical apertures and drill tools.
+
+Two deliberate departures from the artwork, both improvements rather than losses:
+
+- **The board outline is not drawn onto the copper layers.** KiCad 5 plotted Edge.Cuts onto F.Cu and B.Cu as well; that stroke is a plot artifact, not copper, so it is kept on Edge.Cuts only. Copying it into copper would put a trace exactly on the cut line.
+- **Mounting-hole mask openings are taken from the mask Gerbers**, preserving the 6.2 mm soldermask keep-out rings around the RJ-jack mounting holes.
+
+DRC reports 4 copper-to-edge-clearance and 1 soldermask-bridge violation. All five are faithful to the original artwork, not artefacts of the conversion: the 2020 design runs copper right up to the board edge and uses generous mask expansion on the 0.1″ headers. Two "unconnected" items are also expected — the +3V3 and GND rails each exist as two separate copper islands on the HAT (Pi pins 1/17 and 9/39) and are only bonded once the board is seated on the Pi.
+
+One quirk faithfully preserved: a 0.66 mm dangling stub on GPIO25 (J1 pin 22), left over in the original copper and connected to nothing.
+
 ### What could not be recovered
 
 Gerbers carry geometry, not design intent. These are stated rather than invented:
 
-- **Reference designators and footprints.** Pads are recovered as geometry, so the reconstructed layout has no component footprints or refdes; the schematic's designators (`U1`, `J2`, …) are assigned from the silkscreen and the pinouts.
+- **Component values**, other than R1 (5 kΩ, established above). Gerber data has no values, so no BOM can be generated from these files.
+- **Library footprints.** Pads carry recovered geometry — correct size, shape, position and drill — but they are not linked to library footprints, so there is no 3D model or pick-and-place data.
 - **Silkscreen text** is line art in the Gerbers, so in the reconstructed board it is strokes rather than editable text.
-- The board has two separate 3V3 copper nets (Pi pins 1 and 17) and two separate GND nets (pins 9 and 39). They are distinct on the HAT but the same rails once seated on the Pi, so the schematic draws each as one net.
 
-The reconstructed `.kicad_pcb` is geometrically exact — 79 copper pads, 87 holes, 62 top and 54 bottom track segments, all matching the Gerbers — but it carries no netlist, so it has no ratsnest or connectivity DRC. It is a re-spinnable layout, not the original project.
+It is a re-spinnable, netlisted board — but it is a reconstruction, not the original project.
