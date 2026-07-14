@@ -1,0 +1,5 @@
+# KiCad local state / generated intermediates
+*.kicad_prl
+*-backups/
+fp-info-cache
+nets.json
