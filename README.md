@@ -40,6 +40,17 @@ The netlist is not a guess. Gerbers contain no connectivity, but the copper does
 - **Rain gauge** — reed switch to **GPIO6**.
 - **BME280** — I²C on `GPIO2 (SDA)` / `GPIO3 (SCL)`, address `0x77`.
 
+### Jack pinout
+
+Both jacks use the standard staggered modular footprint: pin numbers advance across the connector, with odd pins in one row and even pins in the other.
+
+| Jack | Pin 2 | Pin 3 | Pin 4 | Pin 5 |
+|---|---|---|---|---|
+| **Wind** (6P4C) | vane wiper → `CH0` | anemometer → GPIO5 | GND | +3V3 |
+| **RainFall** (6P2C) | — | rain gauge → GPIO6 | GND | — |
+
+The reed switches in the anemometer and rain gauge simply short their signal pin to GND; `gpiozero`'s `Button()` enables the Pi's internal pull-ups, so no pull-up resistors are fitted on the board.
+
 **R1 = 5 kΩ.** Component values are not in Gerber data, but this one is pinned down two ways: the colour bands on the fitted resistor read green-black-red, and the empirical voltage table in [`wind_dir.py`](https://github.com/irpl/pi-weather/blob/main/src/wind_dir.py) matches a 5 kΩ divider against the standard vane resistances at every point — a 1 kΩ vane arm gives 3.3 × 5/6 = 2.75 V, and 2.75 is exactly what the table records for 90°.
 
 ### Fidelity of the reconstructed board

@@ -126,10 +126,12 @@ def classify(k):
     if near(y, -46.99): return "U1", round((x - 20.32) / P) + 1          # MCP3008 pins 1-8
     if near(y, -39.37): return "U1", 9 + round((38.10 - x) / P)          # MCP3008 pins 9-16
     if near(y, -33.93): return "U2", round((36.17 - x) / P) + 1          # BME280, pin 1 at right
-    for ref, x0 in (("J2", 45.72), ("J3", 60.35)):                        # RJ jacks, 3 cols x 2 rows
-        if x0 - 0.2 <= x <= x0 + 6.6:
-            if near(y, -37.08): return ref, round((x - x0) / 3.175) + 1
-            if near(y, -39.62): return ref, round((x - x0) / 3.175) + 4
+    # RJ11/RJ12 jacks: pads are staggered, not row-major. Pin number advances with x
+    # (1.27 mm) while alternating rows - odd pins in pin-1's row, even pins in the other.
+    # Contacts inside a modular jack sit side by side; their tails cannot cross.
+    for ref, x0 in (("J2", 45.72), ("J3", 60.35)):
+        if x0 - 0.2 <= x <= x0 + 6.6 and (near(y, -37.08) or near(y, -39.62)):
+            return ref, round((x - x0) / 1.27) + 1
     if near(x, 16.51): return "R1", 1 if near(y, -45.72) else 2
     return None, None
 
@@ -177,7 +179,7 @@ NAMED = {                      # (ref,pin) -> net name
  **{("J1", p): "GND" for p in (9, 39)}, **{("J1", p): "+3V3" for p in (1, 17)},
  ("J1", 23): "SPI_SCLK", ("J1", 21): "SPI_MISO", ("J1", 19): "SPI_MOSI", ("J1", 24): "SPI_CE0",
  ("J1", 3): "I2C_SDA", ("J1", 5): "I2C_SCL", ("J1", 29): "WIND_SPD", ("J1", 31): "RAIN",
- ("J2", 4): "WIND_DIR",
+ ("J2", 2): "WIND_DIR",
 }
 group_net = {}
 for k in pads:

@@ -45,13 +45,13 @@ for p in pads:
         name[p] = ("U2", pin, BME.get(pin, f"P{pin}"))
 
 # --- J2 Wind / J3 RainFall: 6-pin RJ jacks ---
+# RJ11/RJ12 jacks: pads are staggered, so the pin number advances with x (1.27 mm)
+# while alternating rows - odd pins in pin-1's row, even pins in the other. The
+# contacts inside a modular jack sit side by side and their tails cannot cross.
 for ref, x0 in (("J2_Wind", 45.72), ("J3_RainFall", 60.35)):
     for p in pads:
-        if near(p[0], x0, 7.0) and (near(p[1], -37.08) or near(p[1], -39.62)) and 44 < p[0] < 68:
-            if not (x0 - 0.2 <= p[0] <= x0 + 6.6): continue
-            col = round((p[0] - x0) / (6.35/2))   # 3 columns per row
-            row = 0 if near(p[1], -37.08) else 1
-            pin = col + 1 + 3*row
+        if x0 - 0.2 <= p[0] <= x0 + 6.6 and (near(p[1], -37.08) or near(p[1], -39.62)):
+            pin = round((p[0] - x0) / 1.27) + 1
             name[p] = (ref, pin, f"pin{pin}")
 
 # --- R1, plus two vias ---

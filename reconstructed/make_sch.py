@@ -63,10 +63,12 @@ PARTS = {                       # ref -> (lib, symbol, value, x, y, ref_dy)
 }
 
 # net -> [(ref, pin), ...]   (taken verbatim from the copper extraction)
+# RJ jack pads are staggered: pin number advances with x while alternating rows,
+# so Wind lands on pins 2-5 (a 6P4C plug) and RainFall on the centre pair 3-4 (6P2C).
 NETS = {
-    "GND":      [("J1","9"),("J1","39"),("J2","5"),("J3","5"),("R1","2"),
+    "GND":      [("J1","9"),("J1","39"),("J2","4"),("J3","4"),("R1","2"),
                  ("U1","9"),("U1","14"),("U2","3")],
-    "+3V3":     [("J1","1"),("J1","17"),("J2","3"),
+    "+3V3":     [("J1","1"),("J1","17"),("J2","5"),
                  ("U1","15"),("U1","16"),("U2","1")],
     "SPI_SCLK": [("J1","23"),("U1","13")],
     "SPI_MISO": [("J1","21"),("U1","12")],
@@ -74,9 +76,9 @@ NETS = {
     "SPI_CE0":  [("J1","24"),("U1","10")],
     "I2C_SDA":  [("J1","3"),("U2","6")],
     "I2C_SCL":  [("J1","5"),("U2","4")],
-    "WIND_SPD": [("J1","29"),("J2","2")],
-    "RAIN":     [("J1","31"),("J3","2")],
-    "WIND_DIR": [("J2","4"),("R1","1"),("U1","1")],
+    "WIND_SPD": [("J1","29"),("J2","3")],
+    "RAIN":     [("J1","31"),("J3","3")],
+    "WIND_DIR": [("J2","2"),("R1","1"),("U1","1")],
 }
 
 # ---------------------------------------------------------------- build
